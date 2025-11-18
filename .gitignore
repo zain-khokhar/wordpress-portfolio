@@ -1,0 +1,65 @@
+# Ignore everything in the root directory
+/*
+
+# But not the backend and portfolio directories
+!/mybackend/
+!/portfolio/
+
+# And not this .gitignore file
+!/.gitignore
+
+# === WordPress (in portfolio/wordpress) ===
+
+# Ignore all WordPress files in the portfolio/wordpress directory
+/portfolio/wordpress/*
+# Except for wp-content
+!/portfolio/wordpress/wp-content/
+
+# Ignore the WordPress core directories
+/portfolio/wordpress/wp-admin/
+/portfolio/wordpress/wp-includes/
+
+# Ignore the default themes and plugins
+/portfolio/wordpress/wp-content/plugins/hello.php
+/portfolio/wordpress/wp-content/plugins/akismet/
+/portfolio/wordpress/wp-content/themes/twenty*/
+
+# Keep custom themes and plugins
+!/portfolio/wordpress/wp-content/themes/
+!/portfolio/wordpress/wp-content/plugins/
+
+# Ignore other directories in wp-content
+/portfolio/wordpress/wp-content/blogs.dir/
+/portfolio/wordpress/wp-content/cache/
+/portfolio/wordpress/wp-content/upgrade/
+/portfolio/wordpress/wp-content/uploads/
+
+# Ignore log files and database backups
+*.log
+*.sql
+*.sitemap
+
+# === Express.js Backend (in mybackend) ===
+
+# Ignore Node.js dependencies
+/mybackend/node_modules/
+
+# Ignore environment variables file
+/mybackend/.env
+
+# Ignore log files
+/mybackend/logs/
+/mybackend/*.log
+
+# Ignore build output
+/mybackend/dist/
+
+# Ignore cache directories
+/mybackend/.cache/
+
+# Ignore test coverage directory
+/mybackend/coverage/
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
