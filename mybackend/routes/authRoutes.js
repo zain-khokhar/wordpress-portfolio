@@ -1,15 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { register , getAllUsers ,  deleteUser , blockUser, getProfile} = require('../controllers/authController');
+const { register, signin, getAllUsers, deleteUser, blockUser, getProfile } = require('../controllers/authController');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
 
-router.post('/login', register);
+// Authentication routes
+router.post('/login', register);  // Signup/Register
+router.post('/signin', signin);   // Sign In (separate endpoint)
+
+// Admin routes
 router.get('/admin', getAllUsers);
-// DELETE endpoint
 router.delete('/admin/:id', deleteUser);
-// put request for admin
 router.put('/users/:id/block', blockUser);
-// Get user profile (protected route)
+
+// User profile route (protected)
 router.get('/profile', authenticateToken, getProfile);
 
 module.exports = router;

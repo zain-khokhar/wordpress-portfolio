@@ -496,18 +496,18 @@
             const errorMsg = document.getElementById('loginError');
 
             try {
-                const res = await fetch(`${API_BASE}/auth/login`, {
+                const res = await fetch(`${API_BASE}/auth/signin`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
                 const data = await res.json();
 
-                if(res.ok) {
-                    sessionStorage.setItem('admin_token', data.token || 'dummy_token');
+                if(res.ok && data.token) {
+                    sessionStorage.setItem('admin_token', data.token);
                     location.reload(); 
                 } else {
-                    errorMsg.innerText = data.message || "Invalid Login";
+                    errorMsg.innerText = data.message || "Invalid Login - Admin Access Required";
                     errorMsg.classList.remove('hidden');
                 }
             } catch (err) {

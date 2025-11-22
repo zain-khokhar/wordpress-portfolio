@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | Digital Agency</title>
+    <title>Sign In | Digital Agency</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,16 +18,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px; /* Added padding to prevent sticking to screen edges */
+            padding: 20px;
         }
 
         /* Hide WP Header if present */
         body.page-id-55 .site-header { display: none; }
         
-        /* Hide header and footer on signup page */
+        /* Hide header on signin page */
         .site-header { display: none !important; }
         header { display: none !important; }
         nav { display: none !important; }
+        
+        /* Hide footer on signin page */
         footer { display: none !important; }
         .site-footer { display: none !important; }
         .footer { display: none !important; }
@@ -38,24 +40,21 @@
             background: #fff;
             width: 1000px;
             max-width: 100%;
-            /* FIX 1: Changed fixed height to min-height so it grows if needed */
             min-height: 650px;
             border-radius: 20px;
-            overflow: hidden; /* Keeps corners rounded */
+            overflow: hidden;
             box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         }
 
         /* --- LEFT SIDE (Visuals) --- */
         .auth-visuals {
             flex: 1;
-            /* FIX 2: Made gradient slightly darker for better contrast */
             background: linear-gradient(135deg, #1e2a36, #10171e);
-            /* FIX 3: Forced white text color */
             color: #ffffff !important;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 60px 40px; /* Increased vertical padding */
+            padding: 60px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -74,12 +73,12 @@
             line-height: 1.2; 
             margin-bottom: 20px; 
             font-weight: 700;
-            color: #ffffff; /* Ensure white */
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3); /* Added shadow for pop */
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         .brand-content p { 
             font-size: 1.1rem; 
-            color: rgba(255,255,255,0.9); /* High contrast white */
+            color: rgba(255,255,255,0.9);
             line-height: 1.6; 
             margin-bottom: 30px; 
         }
@@ -129,9 +128,9 @@
             font-size: 1rem;
             transition: 0.3s;
         }
-        .input-wrapper input, .input-wrapper select {
+        .input-wrapper input {
             width: 100%;
-            padding: 12px 15px 12px 45px; /* Space for icon */
+            padding: 12px 15px 12px 45px;
             border: 2px solid #f0f2f5;
             border-radius: 10px;
             font-size: 0.95rem;
@@ -140,7 +139,7 @@
             background: #f9fafb;
             color: #333;
         }
-        .input-wrapper input:focus, .input-wrapper select:focus {
+        .input-wrapper input:focus {
             border-color: #3498db;
             background: #fff;
             box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
@@ -148,7 +147,7 @@
         .input-wrapper input:focus + i { color: #3498db; }
 
         /* Button Styling */
-        .signup-btn {
+        .signin-btn {
             width: 100%;
             padding: 14px;
             background: linear-gradient(135deg, #3498db, #2980b9);
@@ -161,7 +160,7 @@
             transition: transform 0.2s, box-shadow 0.2s;
             margin-top: 10px;
         }
-        .signup-btn:hover {
+        .signin-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
@@ -171,9 +170,23 @@
         .message.success { color: #27ae60; background: #e8f8f5; padding: 10px; border-radius: 6px; }
         .message.error { color: #e74c3c; background: #fdedec; padding: 10px; border-radius: 6px; }
 
-        .login-link { margin-top: 20px; text-align: center; font-size: 0.9rem; color: #666; }
-        .login-link a { color: #3498db; text-decoration: none; font-weight: 600; }
-        .login-link a:hover { text-decoration: underline; }
+        .signup-link { margin-top: 20px; text-align: center; font-size: 0.9rem; color: #666; }
+        .signup-link a { color: #3498db; text-decoration: none; font-weight: 600; }
+        .signup-link a:hover { text-decoration: underline; }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+        .forgot-password a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
 
         /* Responsive */
         @media (max-width: 850px) {
@@ -189,19 +202,19 @@
     <div class="auth-wrapper">
         <div class="auth-visuals">
             <div class="brand-content">
-                <h1>Build Your<br>Idea Today.</h1>
-                <p>Join our community of innovators. Access premium tools, manage your repositories, and scale your business with our IT solutions.</p>
-                <a href="#" class="brand-btn">Learn More</a>
+                <h1>Welcome<br>Back!</h1>
+                <p>Sign in to access your premium tools, manage your repositories, and continue building amazing projects with our IT solutions.</p>
+                <a href="http://localhost/portfolio/wordpress/" class="brand-btn">Explore More</a>
             </div>
         </div>
 
         <div class="auth-form-container">
             <div class="form-header">
-                <h2 id="formTitle">Create Account</h2>
-                <p id="formSubtitle">Start your journey with Digital Agency 🚀</p>
+                <h2>Sign In</h2>
+                <p>Access your account 👋</p>
             </div>
 
-            <form id="authForm" novalidate>
+            <form id="signinForm" novalidate>
                 
                 <div class="input-group">
                     <label for="email">Email Address</label>
@@ -215,35 +228,20 @@
                     <label for="password">Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" placeholder="Min 8 characters" required>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
                     </div>
                 </div>
 
-                <div class="input-group" id="confirmPasswordGroup">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-check-circle"></i>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password">
-                    </div>
-                </div>
-
-                <div class="input-group" id="roleGroup">
-                    <label for="role">I am a...</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-user-tag"></i>
-                        <select id="role" name="role">
-                            <option value="user" selected>User</option>
-                            <option value="guest">Guest</option>
-                        </select>
-                    </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot Password?</a>
                 </div>
 
                 <div id="message"></div>
 
-                <button type="submit" class="signup-btn">Create Account</button>
+                <button type="submit" class="signin-btn">Sign In</button>
 
-                <p class="login-link">
-                    Already have an account? <a href="http://localhost/portfolio/wordpress/sign-in/">Sign In</a>
+                <p class="signup-link">
+                    Don't have an account? <a href="http://localhost/portfolio/wordpress/signup/">Create Account</a>
                 </p>
             </form>
         </div>
@@ -251,11 +249,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const authForm = document.getElementById('authForm');
+            const signinForm = document.getElementById('signinForm');
             const email = document.getElementById('email');
             const password = document.getElementById('password');
-            const confirmPassword = document.getElementById('confirmPassword');
-            const role = document.getElementById('role');
             const messageDiv = document.getElementById('message');
 
             function showMessage(text, type) {
@@ -263,14 +259,14 @@
                 messageDiv.className = `message ${type}`;
             }
 
-            authForm.addEventListener('submit', async (event) => {
+            signinForm.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 messageDiv.textContent = '';
                 messageDiv.className = '';
 
-                // Validation
-                if (!email.value || !password.value || !confirmPassword.value) {
-                    showMessage('All fields are required.', 'error');
+                // Basic validation
+                if (!email.value || !password.value) {
+                    showMessage('Email and password are required.', 'error');
                     return;
                 }
 
@@ -280,43 +276,32 @@
                     return;
                 }
 
-                if (password.value.length < 8) {
-                    showMessage('Password must be at least 8 characters long.', 'error');
-                    return;
-                }
-
-                if (password.value !== confirmPassword.value) {
-                    showMessage('Passwords do not match.', 'error');
-                    return;
-                }
-
-                // Sign Up API Call
-                const userData = {
+                // Sign In API Call
+                const loginData = {
                     email: email.value,
-                    password: password.value,
-                    role: role.value
+                    password: password.value
                 };
 
-                showMessage('Creating your account...', 'success');
+                showMessage('Signing in...', 'success');
 
                 try {
-                    const response = await fetch('http://localhost:3000/api/auth/login', { 
+                    const response = await fetch('http://localhost:3000/api/auth/signin', { 
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(userData)
+                        body: JSON.stringify(loginData)
                     });
 
                     const data = await response.json();
 
                     if (response.ok && data.token) {
-                        showMessage('Account created successfully! Redirecting to profile...', 'success');
+                        showMessage('Login successful! Redirecting to profile...', 'success');
                         localStorage.setItem('user_token', data.token);
                         console.log('Token saved:', data.token);
                         setTimeout(() => {
                             window.location.href = 'http://localhost/portfolio/wordpress/profile/';
                         }, 1500);
                     } else {
-                        showMessage(data.message || 'Signup failed! Please try again.', 'error');
+                        showMessage(data.message || 'Login failed! Invalid credentials.', 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
