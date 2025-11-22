@@ -4,9 +4,9 @@ const Repository = require('../models/Repository');
 
 const createRepository = async (req, res) => {
   try {
-    const { title, description, githubLink, isPremium } = req.body;
+    const { title, description, githubLink, downloadLink, license, version, readme, isPremium } = req.body;
 
-    const newRepo = new Repository({ title, description, githubLink, isPremium });
+    const newRepo = new Repository({ title, description, githubLink, downloadLink, license, version, readme, isPremium });
     const savedRepo = await newRepo.save();
 
     res.status(201).json(savedRepo);
@@ -27,6 +27,29 @@ const getAllRepositories = async (req, res) => {
   }
 };
 
+// Update repository
+const updateRepository = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, githubLink, downloadLink, license, version, readme, isPremium } = req.body;
+
+    const updatedRepo = await Repository.findByIdAndUpdate(
+      id,
+      { title, description, githubLink, downloadLink, license, version, readme, isPremium },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRepo) {
+      return res.status(404).json({ error: 'Repository not found' });
+    }
+
+    res.status(200).json(updatedRepo);
+  } catch (err) {
+    console.error('Error updating repository:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 // Delete one repository by ID
 const deleteRepository = async (req, res) => {
   try {
@@ -39,4 +62,4 @@ const deleteRepository = async (req, res) => {
   }
 };
 
-module.exports = { createRepository, getAllRepositories, deleteRepository };
+module.exports = { createRepository, getAllRepositories, updateRepository, deleteRepository };

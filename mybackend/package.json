@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "seed": "node seeders/seed.js",
+    "seed:clear": "node seeders/clearDatabase.js"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
@@ -6,7 +12,8 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.4"
+    "mongoose": "^8.16.4",
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

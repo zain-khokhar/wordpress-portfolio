@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository - IT Solutions Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    /* --- Scoped Reset --- */
+    .repo-widget-container * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    /* --- Main Layout Fixes --- */
+    .repo-widget-container { 
+        background: #f4f7f6; 
+        color: #333; 
+        line-height: 1.6; 
+        width: 100%; 
+        /* FIX 1: Removed top padding so black box touches the top */
+        padding: 0 0 40px 0; 
+    }
+    
+    .repository-inner-container { 
+        /* FIX 2: Set width to 100% and removed top margin */
+        max-width: 100%; 
+        margin: 0 auto; 
+    }
+    
+    /* --- Header (Dark Box) --- */
+    .page-header { 
+        text-align: center; 
+        margin-bottom: 40px; 
+        /* FIX 3: Added 120px top padding to push text down, visible below nav */
+        padding: 140px 20px 60px 20px; 
+        background: linear-gradient(135deg, #2c3e50, #1a2530); 
+        color: white; 
+        /* FIX 4: Removed radius so it looks like a full header */
+        border-radius: 0 0 20px 20px; 
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+    }
+    .page-header h1 { font-size: 2.5rem; margin-bottom: 15px; color: white; font-weight: 700; }
+    .page-header p { font-size: 1.1rem; max-width: 700px; margin: 0 auto; opacity: 0.9; font-weight: 300; }
+    
+    /* --- Stats --- */
+    .stats-section { display: flex; justify-content: center; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
+    .stat-card { 
+        background: rgba(255, 255, 255, 0.1); 
+        padding: 15px 25px; 
+        border-radius: 8px; 
+        text-align: center; 
+        min-width: 140px; 
+        backdrop-filter: blur(5px); 
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-number { font-size: 2rem; font-weight: 700; margin-bottom: 5px; line-height: 1.2; }
+    .stat-label { font-size: 0.85rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* --- Filters & Search (Centered Container) --- */
+    .filters-section { 
+        /* FIX 5: Added max-width to keep content centered since container is now 100% */
+        max-width: 1200px;
+        margin: 0 auto 30px auto;
+        background: white; 
+        padding: 20px; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 20px; 
+        align-items: center; 
+    }
+    .search-group { flex: 1; min-width: 300px; position: relative; }
+    .search-group input { 
+        width: 100%; 
+        padding: 12px 20px 12px 45px; 
+        border: 1px solid #ddd; 
+        border-radius: 30px; 
+        font-size: 1rem; 
+        background: #f9f9f9; 
+        transition: all 0.3s ease; 
+    }
+    .search-group input:focus { outline: none; border-color: #3498db; background: white; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+    .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #95a5a6; }
+    
+    .tag-filters { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tag-filter { 
+        padding: 8px 18px; 
+        background: #ecf0f1; 
+        color: #2c3e50; 
+        border-radius: 20px; 
+        cursor: pointer; 
+        transition: all 0.3s ease; 
+        font-weight: 600; 
+        font-size: 0.9rem; 
+        border: 1px solid transparent; 
+    }
+    .tag-filter:hover { background: #bdc3c7; }
+    .tag-filter.active { background: #3498db; color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
+    
+    /* --- Grid & Cards (Centered) --- */
+    .repository-grid { 
+        max-width: 1200px;
+        margin: 0 auto 40px auto;
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+        gap: 30px; 
+    }
+    .repo-card { 
+        background: white; 
+        border-radius: 12px; 
+        overflow: hidden; 
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); 
+        transition: transform 0.3s, box-shadow 0.3s; 
+        display: flex; 
+        flex-direction: column; 
+        height: 100%; 
+        position: relative; 
+        border: 1px solid #eee; 
+    }
+    .repo-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); }
+    
+    .repo-header { padding: 25px; flex-grow: 1; }
+    
+    .repo-tag { 
+        position: absolute; 
+        top: 20px; 
+        right: 20px; 
+        padding: 4px 12px; 
+        border-radius: 4px; 
+        font-weight: 700; 
+        font-size: 0.75rem; 
+        text-transform: uppercase; 
+    }
+    .free-tag { background: #e8f7f0; color: #27ae60; }
+    .premium-tag { background: #fff3cd; color: #d39e00; }
+    
+    .repo-icon { 
+        width: 55px; 
+        height: 55px; 
+        background: #eaf2f8; 
+        border-radius: 12px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin-bottom: 20px; 
+        color: #3498db; 
+        font-size: 1.6rem; 
+    }
+    .repo-title { font-size: 1.3rem; color: #2c3e50; margin-bottom: 10px; font-weight: 700; line-height: 1.3; }
+    .repo-description { color: #666; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.6; }
+    .premium-badge-text { display: inline-block; background: linear-gradient(135deg, #e67e22, #d35400); color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.7rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; }
+    
+    .repo-divider { height: 1px; background: #f0f0f0; margin: 0 25px; }
+    .repo-footer { padding: 20px 25px; margin-top: auto; }
+    
+    .repo-btn { 
+        width: 100%; 
+        padding: 10px 20px; 
+        border: none; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        font-weight: 600; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        transition: background 0.3s ease; 
+        text-decoration: none; 
+        font-size: 0.9rem; 
+    }
+    .github-btn { background: #2c3e50; color: white; }
+    .github-btn:hover { background: #1a2530; }
+    .contact-btn { background: #e67e22; color: white; }
+    .contact-btn:hover { background: #d35400; }
+    
+    .loading-state { grid-column: 1 / -1; text-align: center; padding: 60px; font-size: 1.2rem; color: #7f8c8d; }
+
+    /* --- Pagination Styles --- */
+    .pagination-wrapper { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; padding-bottom: 20px; }
+    .page-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: white; border: 1px solid #ddd; color: #555; cursor: pointer; transition: all 0.2s; }
+    .page-btn:hover:not(.disabled) { background: #3498db; color: white; border-color: #3498db; }
+    .page-btn.active { background: #3498db; color: white; border-color: #3498db; pointer-events: none; }
+    .page-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* --- Preview Modal Styles --- */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+    .modal-overlay.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-content { background: white; border-radius: 16px; max-width: 700px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { background: linear-gradient(135deg, #2c3e50, #1a2530); color: white; padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { font-size: 1.5rem; margin: 0; font-weight: 700; }
+    .modal-close { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.3s; }
+    .modal-close:hover { background: rgba(255, 255, 255, 0.1); }
+    .modal-body { padding: 30px; max-height: 50vh; overflow-y: auto; }
+    .modal-body::-webkit-scrollbar { width: 8px; }
+    .modal-body::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .modal-body::-webkit-scrollbar-thumb { background: #3498db; border-radius: 10px; }
+    .repo-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .meta-item { background: #f8f9fa; padding: 12px; border-radius: 8px; border-left: 4px solid #3498db; }
+    .meta-label { font-size: 0.75rem; text-transform: uppercase; color: #7f8c8d; margin-bottom: 5px; font-weight: 600; }
+    .meta-value { font-size: 0.95rem; color: #2c3e50; font-weight: 600; }
+    .readme-section { margin-top: 20px; }
+    .readme-section h3 { font-size: 1.2rem; color: #2c3e50; margin-bottom: 15px; font-weight: 700; }
+    .readme-text { line-height: 1.8; color: #555; font-size: 0.95rem; text-align: justify; }
+    .modal-footer { padding: 20px 30px; background: #f8f9fa; display: flex; gap: 15px; justify-content: flex-end; border-top: 1px solid #dee2e6; }
+    .modal-btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+    .btn-cancel { background: #e0e0e0; color: #555; }
+    .btn-cancel:hover { background: #d0d0d0; }
+    .btn-download { background: #27ae60; color: white; }
+    .btn-download:hover { background: #229954; }
+    .download-btn { background: #27ae60; color: white; margin-top: 10px; }
+    .download-btn:hover { background: #229954; }
+
+    @media (max-width: 768px) {
+        .filters-section { flex-direction: column; align-items: stretch; }
+        .search-group { min-width: 100%; }
+        .tag-filters { justify-content: center; }
+        .page-header h1 { font-size: 2rem; }
+        .page-header { padding: 120px 20px 40px 20px; }
+    }
+</style>
+
+    <div class="repo-widget-container">
+        <div class="repository-inner-container">
+            <div class="page-header">
+                <h1>Software Repository</h1>
+                <p>Explore our collection of open-source and premium software assets, tools, and libraries</p>
+                <div class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-number" id="stat-total">0</div>
+                        <div class="stat-label">Total Assets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="stat-free">0</div>
+                        <div class="stat-label">Open Source</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="stat-premium">0</div>
+                        <div class="stat-label">Premium</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filters-section">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="repoSearch" placeholder="Search repositories...">
+                </div>
+                <div class="tag-filters">
+                    <div class="tag-filter active" data-filter="all">All</div>
+                    <div class="tag-filter" data-filter="free">Open Source</div>
+                    <div class="tag-filter" data-filter="premium">Premium</div>
+                </div>
+            </div>
+            
+            <div class="repository-grid" id="repoContainer">
+                <div class="loading-state">Loading repositories...</div>
+            </div>
+
+            <div id="paginationControls" class="pagination-wrapper"></div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Repository Preview</h2>
+                <button class="modal-close" onclick="closePreviewModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="repo-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Version</div>
+                        <div class="meta-value" id="modalVersion">-</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">License</div>
+                        <div class="meta-value" id="modalLicense">-</div>
+                    </div>
+                </div>
+                <div class="readme-section">
+                    <h3>📖 About This Repository</h3>
+                    <p class="readme-text" id="modalReadme">Loading...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-cancel" onclick="closePreviewModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="modal-btn btn-download" id="modalDownloadBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // --- CONFIGURATION ---
+    const API_URL = 'http://localhost:3000/api/repo/admin/';
+    const ITEMS_PER_PAGE = 6; // Limit items per page
+
+    // --- DOM ELEMENTS ---
+    const repoContainer = document.getElementById('repoContainer');
+    const paginationContainer = document.getElementById('paginationControls');
+    const searchInput = document.getElementById('repoSearch');
+    const filterTags = document.querySelectorAll('.tag-filter');
+    const statTotal = document.getElementById('stat-total');
+    const statFree = document.getElementById('stat-free');
+    const statPremium = document.getElementById('stat-premium');
+
+    // --- STATE ---
+    let allRepositories = [];
+    let filteredRepositories = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentPage = 1;
+
+    // --- 1. FETCH DATA (With Fail-Safe) ---
+    async function fetchRepositories() {
+        const BACKUP_DATA = [
+            { title: "Cloud Deployment Toolkit", description: "Terraform modules for automated AWS/Azure deployment.", isPremium: false, githubLink: "#" },
+            { title: "Enterprise Security Suite", description: "Real-time threat detection and compliance management.", isPremium: true, githubLink: "#" },
+            { title: "Mobile UI Kit", description: "React Native component library with 50+ elements.", isPremium: false, githubLink: "#" },
+            { title: "AI Analytics Dashboard", description: "Machine learning powered business intelligence tool.", isPremium: true, githubLink: "#" },
+            { title: "E-Commerce Starter", description: "Next.js and Node.js full stack starter kit.", isPremium: false, githubLink: "#" },
+            { title: "DevOps Pipeline Scripts", description: "Jenkins and GitHub Actions CI/CD automation.", isPremium: true, githubLink: "#" },
+            { title: "CRM System", description: "Customer relationship management with email integration.", isPremium: true, githubLink: "#" },
+            { title: "Chatbot Widget", description: "Embeddable chatbot for customer support websites.", isPremium: false, githubLink: "#" }
+        ];
+
+        try {
+            console.log("Fetching API...");
+            const res = await fetch(API_URL);
+            
+            if (!res.ok) throw new Error(`API Error Status: ${res.status}`);
+            
+            const data = await res.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+                allRepositories = data;
+            } else {
+                throw new Error("Empty data");
+            }
+
+        } catch (err) {
+            console.warn('Using Backup Data:', err.message);
+            allRepositories = BACKUP_DATA;
+        } finally {
+            applyFilters(); // Process data
+            updateStats();
+        }
+    }
+
+    // --- 2. FILTER LOGIC ---
+    function applyFilters() {
+        filteredRepositories = allRepositories.filter(repo => {
+            // Search Logic
+            const rTitle = (repo.title || "").toLowerCase();
+            const rDesc = (repo.description || "").toLowerCase();
+            const matchesSearch = rTitle.includes(currentSearch) || rDesc.includes(currentSearch);
+            
+            // Filter Logic
+            let matchesFilter = true;
+            if (currentFilter === 'premium') matchesFilter = repo.isPremium === true;
+            if (currentFilter === 'free') matchesFilter = repo.isPremium === false;
+
+            return matchesSearch && matchesFilter;
+        });
+
+        currentPage = 1; // Reset to first page on new filter
+        renderPage();
+    }
+
+    // --- 3. RENDER PAGE & PAGINATION ---
+    function renderPage() {
+        repoContainer.innerHTML = '';
+
+        if (filteredRepositories.length === 0) {
+            repoContainer.innerHTML = '<div class="loading-state">No matching repositories found.</div>';
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        // Calculate Slice
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        const paginatedItems = filteredRepositories.slice(start, end);
+
+        // Render Items
+        paginatedItems.forEach((repo, index) => {
+            const card = document.createElement('div');
+            card.className = 'repo-card';
+            
+            const isPrem = repo.isPremium === true;
+            const icon = getIconForRepo(repo.title || "");
+            const repoId = `repo-${start + index}`;
+            
+            card.innerHTML = `
+                <div class="repo-header">
+                    <span class="repo-tag ${isPrem ? 'premium-tag' : 'free-tag'}">${isPrem ? 'Premium' : 'Free'}</span>
+                    <div class="repo-icon" ${isPrem ? 'style="background:#fff3cd;color:#e67e22;"' : ''}>
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <h2 class="repo-title">${repo.title}</h2>
+                    <p class="repo-description">${repo.description}</p>
+                    ${isPrem ? '<div class="premium-badge-text">Enterprise Ready</div>' : ''}
+                </div>
+                <div class="repo-divider"></div>
+                <div class="repo-footer">
+                    ${!isPrem ? `<a href="${repo.githubLink}" target="_blank" class="repo-btn github-btn" style="margin-bottom: 10px;">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>` : ''}
+                    ${repo.downloadLink && !isPrem ? `<button class="repo-btn download-btn" id="${repoId}" style="margin-bottom: 10px;">
+                        <i class="fas fa-download"></i> Download
+                    </button>` : ''}
+                    ${isPrem ? `<button class="repo-btn contact-btn" onclick="requestPremiumAccess('${repo._id}', '${repo.title}')">
+                        <i class="fas fa-crown"></i> Request Premium Access
+                    </button>` : ''}
+                </div>
+            `;
+            repoContainer.appendChild(card);
+            
+            // Add event listener for download button
+            if (repo.downloadLink) {
+                const downloadBtn = document.getElementById(repoId);
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', () => openPreviewModal(repo));
+                }
+            }
+        });
+
+        renderPagination();
+    }
+
+    function renderPagination() {
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(filteredRepositories.length / ITEMS_PER_PAGE);
+
+        if (totalPages <= 1) return; // No pagination needed
+
+        // Prev
+        const prevBtn = createPageBtn('<i class="fas fa-chevron-left"></i>', () => {
+            if (currentPage > 1) { currentPage--; renderPage(); window.scrollTo({top:400, behavior:'smooth'}); }
+        });
+        if (currentPage === 1) prevBtn.classList.add('disabled');
+        paginationContainer.appendChild(prevBtn);
+
+        // Numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = createPageBtn(i, () => {
+                currentPage = i;
+                renderPage();
+                window.scrollTo({top:400, behavior:'smooth'});
+            });
+            if (i === currentPage) btn.classList.add('active');
+            paginationContainer.appendChild(btn);
+        }
+
+        // Next
+        const nextBtn = createPageBtn('<i class="fas fa-chevron-right"></i>', () => {
+            if (currentPage < totalPages) { currentPage++; renderPage(); window.scrollTo({top:400, behavior:'smooth'}); }
+        });
+        if (currentPage === totalPages) nextBtn.classList.add('disabled');
+        paginationContainer.appendChild(nextBtn);
+    }
+
+    function createPageBtn(html, onClick) {
+        const btn = document.createElement('div');
+        btn.className = 'page-btn';
+        btn.innerHTML = html;
+        btn.addEventListener('click', onClick);
+        return btn;
+    }
+
+    // --- 4. HELPER FUNCTIONS ---
+    function getIconForRepo(title) {
+        const t = title.toLowerCase();
+        if(t.includes('security') || t.includes('auth')) return 'fa-shield-alt';
+        if(t.includes('mobile') || t.includes('ui') || t.includes('app')) return 'fa-mobile-alt';
+        if(t.includes('cloud') || t.includes('server')) return 'fa-server';
+        if(t.includes('ai') || t.includes('analy')) return 'fa-robot';
+        if(t.includes('shop') || t.includes('commerce')) return 'fa-shopping-cart';
+        return 'fa-code';
+    }
+
+    function updateStats() {
+        if (!Array.isArray(allRepositories)) return;
+        statTotal.innerText = allRepositories.length;
+        statFree.innerText = allRepositories.filter(r => !r.isPremium).length;
+        statPremium.innerText = allRepositories.filter(r => r.isPremium).length;
+    }
+
+    // --- 5. EVENT LISTENERS ---
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase();
+            applyFilters();
+        });
+    }
+
+    if(filterTags) {
+        filterTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                filterTags.forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                currentFilter = tag.getAttribute('data-filter');
+                applyFilters();
+            });
+        });
+    }
+
+    // --- 6. PREVIEW MODAL FUNCTIONS ---
+    let currentDownloadLink = '';
+
+    function openPreviewModal(repo) {
+        const modal = document.getElementById('previewModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalVersion = document.getElementById('modalVersion');
+        const modalLicense = document.getElementById('modalLicense');
+        const modalReadme = document.getElementById('modalReadme');
+        const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+
+        // Populate modal content
+        modalTitle.innerText = repo.title || 'Repository Preview';
+        modalVersion.innerText = repo.version || 'N/A';
+        modalLicense.innerText = repo.license || 'N/A';
+        modalReadme.innerText = repo.readme || 'No README available for this repository.';
+        
+        // Store download link
+        currentDownloadLink = repo.downloadLink || '';
+
+        // Set up download button
+        modalDownloadBtn.onclick = () => {
+            if (currentDownloadLink) {
+                window.open(currentDownloadLink, '_blank');
+                closePreviewModal();
+            }
+        };
+
+        // Show modal
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+    }
+
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Restore scroll
+        currentDownloadLink = '';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('previewModal').addEventListener('click', (e) => {
+        if (e.target.id === 'previewModal') {
+            closePreviewModal();
+        }
+    });
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+        }
+    });
+
+    // --- PREMIUM REQUEST FUNCTIONALITY ---
+    async function requestPremiumAccess(repoId, repoTitle) {
+        // Check if user is logged in
+        const token = localStorage.getItem('user_token') || sessionStorage.getItem('user_token');
+        
+        if (!token) {
+            alert('Please login to request premium access');
+            window.location.href = '/signup.html';
+            return;
+        }
+
+        const confirmed = confirm(`Request premium access to "${repoTitle}"?\n\nYou will receive an email notification once your request is reviewed by our admin team.`);
+        
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch('http://localhost:3000/api/premium-requests/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    repositoryId: repoId,
+                    message: `I would like to request premium access to ${repoTitle}`
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('✅ Premium access request submitted successfully!\n\nYou will receive an email confirmation shortly. Our team will review your request within 24-48 hours.');
+            } else {
+                alert(`❌ ${data.message || 'Failed to submit request'}`);
+            }
+        } catch (error) {
+            console.error('Error submitting premium request:', error);
+            alert('❌ Network error. Please check if the server is running and try again.');
+        }
+    }
+
+    // Start
+    document.addEventListener('DOMContentLoaded', fetchRepositories);
+    </script>
+</body>
+</html>

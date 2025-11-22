@@ -38,4 +38,24 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// update product controller
+const updateProduct = async (req, res) => {
+  try {
+    const { image, title, description } = req.body;
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      { image, title, description },
+      { new: true, runValidators: true }
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(updatedProduct);
+  } catch (err) {
+    console.error('Error updating product:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = { createProduct , getAllProducts , deleteProduct };
+module.exports = { createProduct, getAllProducts, deleteProduct, updateProduct };

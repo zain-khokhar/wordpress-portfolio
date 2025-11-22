@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Showcase - IT Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Global Reset & Typography --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f4f7f6; color: #333; line-height: 1.6; min-height: 100vh; }
+
+        /* --- Layout Wrappers --- */
+        .app-container { width: 100%; padding: 40px 0px; }
+        
+        /* FIX: Added top margin here to push content below the fixed Navbar */
+        .inner-wrapper { 
+            max-width: 100%; 
+            margin: -40px auto 0;   /* 120px pushes it down from the top */
+        }
+
+        /* --- Header Section (Repo Style) --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+            /* FIX: Adjusted padding back to normal size since margin handles the positioning now */
+            padding: 80px 20px; 
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .header-section h1 { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; }
+        .header-section p { font-size: 1.1rem; max-width: 700px; margin: 0 auto; opacity: 0.9; font-weight: 300; }
+
+        /* --- Stats Bar --- */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 140px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-val { font-size: 2rem; font-weight: 700; display: block; line-height: 1.2; }
+        .stat-lbl { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+
+        /* --- Controls (Search & Filter) --- */
+        .controls-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .search-wrap {
+            flex: 1;
+            min-width: 280px;
+            position: relative;
+        }
+        .search-wrap i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #95a5a6; }
+        .search-wrap input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: all 0.3s;
+        }
+        .search-wrap input:focus { outline: none; border-color: #3498db; background: #fff; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+
+        .filter-wrap {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .filter-btn:hover { background: #bdc3c7; }
+        .filter-btn.active { background: #3498db; color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
+
+        /* --- Product Grid --- */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* --- Product Card --- */
+        .prod-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .prod-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        
+        .card-top {
+            height: 160px;
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-icon { font-size: 3.5rem; color: #3498db; }
+        .card-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #27ae60;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.25rem; font-weight: 700; color: #2c3e50; margin-bottom: 10px; }
+        .card-desc { font-size: 0.95rem; color: #7f8c8d; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; }
+        
+        .card-tags { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tag-pill { background: #f0f2f5; color: #555; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+
+        .card-footer { border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: auto; }
+        .btn-explore {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px;
+            background: white;
+            border: 1px solid #3498db;
+            color: #3498db;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-explore:hover { background: #3498db; color: white; }
+
+        /* --- Pagination --- */
+        .pagination-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #ddd;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .page-btn:hover:not(.disabled) { background: #3498db; color: white; border-color: #3498db; }
+        .page-btn.active { background: #3498db; color: white; border-color: #3498db; pointer-events: none; }
+        .page-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- Utility --- */
+        .loading-msg { grid-column: 1/-1; text-align: center; padding: 60px; color: #7f8c8d; font-size: 1.2rem; }
+        
+        @media (max-width: 768px) {
+            .controls-bar { flex-direction: column; align-items: stretch; }
+            .filter-wrap { justify-content: center; }
+            .header-section h1 { font-size: 2rem; }
+        }
+        .IT{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="inner-wrapper">
+
+        <div class="header-section">
+            <h1 class="IT">Advanced IT Solutions</h1>
+            <p>Discover our cutting-edge products designed to transform your business operations through automation, security, and data intelligence.</p>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-total">0</span>
+                    <span class="stat-lbl">Total Products</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-cats">0</span>
+                    <span class="stat-lbl">Categories</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-bar">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchBox" placeholder="Search products by name or description...">
+            </div>
+            <div class="filter-wrap" id="categoryFilters">
+                <div class="filter-btn active" data-cat="all">All</div>
+                </div>
+        </div>
+
+        <div id="productsContainer" class="products-grid">
+            <div class="loading-msg">Loading products...</div>
+        </div>
+
+        <div id="paginationControls" class="pagination-wrap"></div>
+
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION ---
+    const API_ENDPOINT = 'http://localhost:3000/api/products/admin';
+    const ITEMS_PER_PAGE = 6;
+
+    // --- STATE MANAGEMENT ---
+    let state = {
+        allProducts: [],
+        filteredProducts: [],
+        categories: new Set(),
+        currentPage: 1,
+        currentCategory: 'all',
+        searchQuery: ''
+    };
+
+    // --- DOM ELEMENTS ---
+    const gridEl = document.getElementById('productsContainer');
+    const paginationEl = document.getElementById('paginationControls');
+    const filterContainer = document.getElementById('categoryFilters');
+    const searchInput = document.getElementById('searchBox');
+    const statTotalEl = document.getElementById('stat-total');
+    const statCatsEl = document.getElementById('stat-cats');
+
+    // --- BACKUP DATA (Fail-Safe) ---
+    const BACKUP_DATA = [
+        { title: "Workflow Automator Pro", description: "AI-driven platform to automate complex business processes.", category: "Automation", icon: "fa-cogs" },
+        { title: "MediCare EHR Platform", description: "Comprehensive electronic health records system.", category: "Healthcare", icon: "fa-hospital" },
+        { title: "CyberShield Pro", description: "AI-powered threat detection and response platform.", category: "Security", icon: "fa-shield-alt" },
+        { title: "DataFusion Platform", description: "Unified data platform for analyzing large-scale datasets.", category: "Data", icon: "fa-database" },
+        { title: "PatientSecure Portal", description: "HIPAA-compliant patient portal with telehealth capabilities.", category: "Healthcare", icon: "fa-user-md" },
+        { title: "CloudSync Enterprise", description: "Hybrid cloud solution with seamless integration.", category: "Cloud", icon: "fa-cloud" },
+        { title: "AutoML Analytics", description: "Automated machine learning platform for predictive models.", category: "Data", icon: "fa-brain" },
+        { title: "Compliance Guardian", description: "Automated compliance monitoring for GDPR and HIPAA.", category: "Security", icon: "fa-file-contract" },
+        { title: "SalesBot AI", description: "Conversational AI for automating customer sales pipelines.", category: "Automation", icon: "fa-comments-dollar" }
+    ];
+
+    // --- INITIALIZATION ---
+    async function initApp() {
+        try {
+            const res = await fetch(API_ENDPOINT);
+            if (!res.ok) throw new Error("API Failed");
+            const data = await res.json();
+            
+            if(Array.isArray(data) && data.length > 0) {
+                state.allProducts = data;
+            } else {
+                throw new Error("Empty Data");
+            }
+        } catch (err) {
+            console.warn("Using backup data:", err);
+            state.allProducts = BACKUP_DATA;
+        }
+
+        // Extract Categories
+        state.allProducts.forEach(p => {
+            if(p.category) state.categories.add(p.category);
+        });
+
+        // Initial Render
+        updateStats();
+        renderCategoryButtons();
+        applyFilters(); // This calls renderGrid and renderPagination
+    }
+
+    // --- CORE LOGIC ---
+
+    function updateStats() {
+        statTotalEl.innerText = state.allProducts.length;
+        statCatsEl.innerText = state.categories.size;
+    }
+
+    function renderCategoryButtons() {
+        // Keep "All" button, remove others
+        filterContainer.innerHTML = '<div class="filter-btn active" data-cat="all">All</div>';
+        
+        state.categories.forEach(cat => {
+            const btn = document.createElement('div');
+            btn.className = 'filter-btn';
+            btn.innerText = cat;
+            btn.dataset.cat = cat;
+            btn.addEventListener('click', () => handleFilterClick(btn, cat));
+            filterContainer.appendChild(btn);
+        });
+
+        // Re-attach listener to "All"
+        filterContainer.querySelector('[data-cat="all"]').addEventListener('click', function() {
+            handleFilterClick(this, 'all');
+        });
+    }
+
+    function handleFilterClick(clickedBtn, category) {
+        // Update UI
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        clickedBtn.classList.add('active');
+        
+        // Update State
+        state.currentCategory = category;
+        state.currentPage = 1; // Reset to page 1
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const term = state.searchQuery.toLowerCase();
+        
+        state.filteredProducts = state.allProducts.filter(product => {
+            const matchesSearch = (product.title || '').toLowerCase().includes(term) || 
+                                  (product.description || '').toLowerCase().includes(term);
+            
+            const matchesCat = state.currentCategory === 'all' || product.category === state.currentCategory;
+
+            return matchesSearch && matchesCat;
+        });
+
+        renderPagination();
+        renderGrid();
+    }
+
+    function renderGrid() {
+        gridEl.innerHTML = '';
+
+        if (state.filteredProducts.length === 0) {
+            gridEl.innerHTML = '<div class="loading-msg">No products found matching your criteria.</div>';
+            return;
+        }
+
+        // Pagination Logic
+        const startIndex = (state.currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        const pageData = state.filteredProducts.slice(startIndex, endIndex);
+
+        pageData.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'prod-card';
+            
+            // LOGIC CHECK: Use Image URL if valid, otherwise Icon
+            let visualContent;
+            if (product.image && product.image.startsWith('http')) {
+                visualContent = `<img src="${product.image}" alt="${product.title}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                const iconClass = product.icon || 'fa-box'; 
+                visualContent = `<i class="fas ${iconClass} card-icon"></i>`;
+            }
+
+            card.innerHTML = `
+                <div class="card-top" style="padding:0;">
+                    <div class="card-badge" style="z-index:2;">${product.category || 'Product'}</div>
+                    ${visualContent}
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">${product.title}</h3>
+                    <p class="card-desc">${product.description}</p>
+                    
+                    <div class="card-tags">
+                        <span class="tag-pill">${product.category || 'General'}</span>
+                        <span class="tag-pill">Solution</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="#" class="btn-explore">Explore Solution <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            `;
+            gridEl.appendChild(card);
+        });
+    }
+
+    function renderPagination() {
+        paginationEl.innerHTML = '';
+        const totalPages = Math.ceil(state.filteredProducts.length / ITEMS_PER_PAGE);
+
+        if (totalPages <= 1) return;
+
+        // Prev Button
+        const prevBtn = createPageBtn('<i class="fas fa-chevron-left"></i>', () => {
+            if(state.currentPage > 1) {
+                state.currentPage--;
+                applyFilters(); // Re-render
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+            }
+        });
+        if(state.currentPage === 1) prevBtn.classList.add('disabled');
+        paginationEl.appendChild(prevBtn);
+
+        // Number Buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = createPageBtn(i, () => {
+                state.currentPage = i;
+                applyFilters();
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+            });
+            if (i === state.currentPage) btn.classList.add('active');
+            paginationEl.appendChild(btn);
+        }
+
+        // Next Button
+        const nextBtn = createPageBtn('<i class="fas fa-chevron-right"></i>', () => {
+            if(state.currentPage < totalPages) {
+                state.currentPage++;
+                applyFilters();
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+            }
+        });
+        if(state.currentPage === totalPages) nextBtn.classList.add('disabled');
+        paginationEl.appendChild(nextBtn);
+    }
+
+    function createPageBtn(content, onClick) {
+        const btn = document.createElement('div');
+        btn.className = 'page-btn';
+        btn.innerHTML = content;
+        btn.addEventListener('click', onClick);
+        return btn;
+    }
+
+    // --- EVENT LISTENERS ---
+    searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        state.currentPage = 1;
+        applyFilters();
+    });
+
+    // --- RUN ---
+    document.addEventListener('DOMContentLoaded', initApp);
+
+</script>
+</body>
+</html>

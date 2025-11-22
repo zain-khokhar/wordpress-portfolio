@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Secure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- GLOBAL RESET --- */
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; overflow: hidden; }
+        
+        /* --- THE NEW TOP DARK BAR (The "Div Upon Him") --- */
+        .top-global-bar {
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            width: 100%;
+            height: 8vh; /* Shifted down 8vh for better visibility */
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            z-index: 60;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* --- 1. LOGIN SCREEN STYLES --- */
+        #login-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(135deg, #1e2a36, #10171e);
+            z-index: 99999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .login-card {
+            background: white; padding: 50px; width: 100%; max-width: 450px;
+            border-radius: 15px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .login-input {
+            width: 100%; padding: 15px; margin-bottom: 15px;
+            border: 2px solid #eee; border-radius: 8px;
+            font-size: 1rem; transition: 0.3s;
+        }
+        .login-input:focus { border-color: #3498db; outline: none; }
+        .login-btn {
+            width: 100%; padding: 15px; background: #3498db; color: white;
+            border: none; border-radius: 8px; font-weight: 600; font-size: 1.1rem;
+            cursor: pointer; transition: 0.3s;
+        }
+        .login-btn:hover { background: #2980b9; }
+
+        /* --- 2. DASHBOARD LAYOUT --- */
+        #dashboard-view { display: none; height: 100vh; flex-direction: column; }
+        
+        /* The Container for Sidebar + Main Content (Takes remaining height) */
+        .main-layout {
+            display: flex;
+            height: 92vh; /* 100vh - 8vh (top bar) */
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05); 
+            z-index: 50;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-area {
+            background: #f4f7f6; 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dashboard-card {
+            background: white; border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .dashboard-card:hover { transform: translateY(-5px); }
+
+        /* Product & Repo Cards */
+        .item-card {
+            background: white; border: 1px solid #eee; border-radius: 10px;
+            overflow: hidden; display: flex; flex-direction: column;
+            transition: 0.3s;
+        }
+        .item-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        
+        .item-img-box {
+            height: 180px; background: #f8fafc; display: flex;
+            align-items: center; justify-content: center; overflow: hidden;
+        }
+        .item-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .item-icon { font-size: 3rem; color: #3498db; }
+
+        /* Pagination */
+        .pagination-wrapper { display: flex; justify-content: center; gap: 10px; margin-top: 30px; padding-bottom: 50px; }
+        .page-btn {
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            background: white; border: 1px solid #ddd; border-radius: 50%; cursor: pointer;
+        }
+        .page-btn.active { background: #3498db; color: white; border-color: #3498db; }
+        .page-btn:hover:not(.active) { background: #f1f1f1; }
+
+        /* Sections */
+        .section-content { display: none; animation: fadeIn 0.4s; }
+        .section-content.active { display: block; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+        /* Navigation */
+        .nav-item.active { background: #eff6ff; color: #2563eb; border-right: 3px solid #6087dc; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .modal-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-view">
+        <div class="login-card">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Admin Access</h2>
+            <p class="text-gray-500 mb-6">Restricted Area. Please verify your identity.</p>
+            
+            <form id="adminLoginForm">
+                <input type="email" id="loginEmail" class="login-input" placeholder="admin@domain.com" required>
+                <input type="password" id="loginPass" class="login-input" placeholder="Password" required>
+                <button type="submit" class="login-btn">Secure Login</button>
+                <p id="loginError" class="text-red-500 mt-4 hidden text-sm"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-view">
+        
+        <div class="top-global-bar">
+            <h2 class="text-xl font-bold tracking-wide">ADMIN PORTAL</h2>
+            </div>
+
+        <div class="main-layout">
+            
+            <aside class="sidebar w-64 hidden md:flex">
+                <div class="p-6 border-b bg-white">
+                    <h1 class="text-2xl font-bold text-indigo-600">Digital Agency</h1>
+                    <p class="text-xs text-gray-500">Control Panel</p>
+                </div>
+                <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                    <button class="nav-item w-full text-left p-3 rounded font-medium  hover:bg-blue-200 active" onclick="showSection('dashboard')">
+                        <i class="fas fa-chart-pie w-6"></i> Dashboard
+                    </button>
+                    <button class="nav-item w-full text-left p-3 rounded font-medium text-gray-600 hover:bg-blue-200 " onclick="showSection('products')">
+                        <i class="fas fa-box w-6"></i> Products
+                    </button>
+                    <button class="nav-item w-full text-left p-3 rounded font-medium text-gray-600 hover:bg-blue-200 " onclick="showSection('users')">
+                        <i class="fas fa-users w-6"></i> Users
+                    </button>
+                    <button class="nav-item w-full text-left p-3 rounded font-medium text-gray-600 hover:bg-blue-200 " onclick="showSection('repositories')">
+                        <i class="fas fa-code-branch w-6"></i> Repositories
+                    </button>
+                    <button class="nav-item w-full text-left p-3 rounded font-medium text-gray-600 hover:bg-blue-200 " onclick="showSection('premium-requests')">
+                        <i class="fas fa-crown w-6"></i> Premium Requests
+                    </button>
+                    <button class="nav-item w-full text-left p-3 rounded font-medium text-gray-600 hover:bg-blue-200 " onclick="showSection('feedback')">
+                        <i class="fas fa-comment-dots w-6"></i> Feedback
+                    </button>
+                    <button class="nav-item w-full text-left p-3 rounded font-medium text-gray-600 hover:bg-blue-200 " onclick="showSection('activity-logs')">
+                        <i class="fas fa-history w-6"></i> Activity Logs
+                    </button>
+                </nav>
+                <div class="p-4 border-t">
+                    <button onclick="logout()" class="w-full p-2 text-red-500 hover:bg-red-50 rounded text-sm font-bold">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </aside>
+
+            <div class="content-area">
+                <header class="bg-white shadow-sm p-4 flex justify-between items-center z-10">
+                    <h2 id="pageTitle" class="text-xl font-bold text-gray-800">Dashboard</h2>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-600">Admin</span>
+                        <img src="https://placehold.co/40" class="w-8 h-8 rounded-full border">
+                    </div>
+                </header>
+
+                <main class="flex-1 overflow-y-auto p-6 pb-32">
+                    
+                    <div id="dashboard-content" class="section-content active">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Total Products</p>
+                                        <h3 class="text-3xl font-bold text-indigo-600" id="stat-prod">0</h3>
+                                    </div>
+                                    <i class="fas fa-box text-3xl text-indigo-100"></i>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Total Users</p>
+                                        <h3 class="text-3xl font-bold text-indigo-600" id="stat-user">0</h3>
+                                    </div>
+                                    <i class="fas fa-users text-3xl text-indigo-100"></i>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Repositories</p>
+                                        <h3 class="text-3xl font-bold text-indigo-600" id="stat-repo">0</h3>
+                                    </div>
+                                    <i class="fas fa-code-branch text-3xl text-indigo-100"></i>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Feedback Entries</p>
+                                        <h3 class="text-3xl font-bold text-indigo-600" id="stat-feedback">0</h3>
+                                    </div>
+                                    <i class="fas fa-comment-dots text-3xl text-indigo-100"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Pending Requests</p>
+                                        <h3 class="text-3xl font-bold text-orange-600" id="stat-pending-requests">0</h3>
+                                    </div>
+                                    <i class="fas fa-clock text-3xl text-orange-100"></i>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Premium Access Given</p>
+                                        <h3 class="text-3xl font-bold text-green-600" id="stat-approved-requests">0</h3>
+                                    </div>
+                                    <i class="fas fa-check-circle text-3xl text-green-100"></i>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-gray-500 text-sm">Total Activities (7d)</p>
+                                        <h3 class="text-3xl font-bold text-blue-600" id="stat-activities">0</h3>
+                                    </div>
+                                    <i class="fas fa-chart-line text-3xl text-blue-100"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="products-content" class="section-content">
+                        <div class="bg-white p-6 rounded-lg shadow-sm mb-8 max-w-3xl mx-auto">
+                            <h3 class="text-lg font-bold mb-4">Create New Product</h3>
+                            <form id="createProductForm" class="space-y-4">
+                                <input type="text" name="image" placeholder="Image URL (http://...)" class="w-full p-2 border rounded">
+                                <input type="text" name="title" placeholder="Product Title" class="w-full p-2 border rounded" required>
+                                <textarea name="description" placeholder="Description" class="w-full p-2 border rounded" rows="3"></textarea>
+                                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Add Product</button>
+                            </form>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold mb-4">Product List</h3>
+                        <div id="productList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                        <div id="prodPagination" class="pagination-wrapper"></div>
+                    </div>
+
+                    <div id="users-content" class="section-content">
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden max-w-4xl mx-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 border-b">
+                                    <tr>
+                                        <th class="p-4 text-sm font-semibold text-gray-600">Email</th>
+                                        <th class="p-4 text-sm font-semibold text-gray-600">Role</th>
+                                        <th class="p-4 text-sm font-semibold text-gray-600">Status</th>
+                                        <th class="p-4 text-sm font-semibold text-gray-600 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="repositories-content" class="section-content">
+                        <div class="bg-white p-6 rounded-lg shadow-sm mb-8 max-w-3xl mx-auto">
+                            <h3 class="text-lg font-bold mb-4">Upload Repository</h3>
+                            <form id="createRepoForm" class="space-y-4">
+                                <input type="text" name="title" placeholder="Repo Title" class="w-full p-2 border rounded" required>
+                                <input type="text" name="description" placeholder="Description" class="w-full p-2 border rounded">
+                                <input type="url" name="githubLink" placeholder="GitHub Link" class="w-full p-2 border rounded" required>
+                                <input type="url" name="downloadLink" placeholder="Download Link (Optional)" class="w-full p-2 border rounded">
+                                <input type="text" name="license" placeholder="License (e.g., MIT, GPL)" class="w-full p-2 border rounded">
+                                <input type="text" name="version" placeholder="Version (e.g., 1.0.0)" class="w-full p-2 border rounded">
+                                <select name="isPremium" class="w-full p-2 border rounded bg-white">
+                                    <option value="false">Free</option>
+                                    <option value="true">Premium</option>
+                                </select>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Upload Repo</button>
+                            </form>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold mb-4">Repositories List</h3>
+                        <div id="repoList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                        <div id="repoPagination" class="pagination-wrapper"></div>
+                    </div>
+
+                    <!-- Premium Requests Section -->
+                    <div id="premium-requests-content" class="section-content">
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="p-6 border-b">
+                                <h3 class="text-xl font-bold">Premium Access Requests</h3>
+                                <p class="text-gray-500 text-sm mt-1">Approve or reject user requests for premium repository access</p>
+                            </div>
+                            <div class="p-4 space-y-4" id="premiumRequestsList">
+                                <p class="text-gray-500 text-center py-8">Loading requests...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="feedback-content" class="section-content">
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="p-6 border-b">
+                                <h3 class="text-xl font-bold">User Feedback & Contact Submissions</h3>
+                                <p class="text-gray-500 text-sm mt-1">Manage feedback and contact sales inquiries</p>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="bg-gray-50 border-b">
+                                        <tr>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Name</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Email</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Company</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Status</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Date</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="feedbackTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Logs Section -->
+                    <div id="activity-logs-content" class="section-content">
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="p-6 border-b flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-xl font-bold">Activity Logs & Audit Trail</h3>
+                                    <p class="text-gray-500 text-sm mt-1">Monitor all system activities and user actions</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <select id="actionFilter" class="p-2 border rounded text-sm">
+                                        <option value="">All Actions</option>
+                                        <option value="login">Login</option>
+                                        <option value="premium_request_submitted">Premium Requests</option>
+                                        <option value="premium_access_granted">Access Granted</option>
+                                        <option value="premium_access_rejected">Access Rejected</option>
+                                        <option value="user_blocked">User Blocked</option>
+                                        <option value="feedback_replied">Feedback Replied</option>
+                                    </select>
+                                    <button onclick="loadActivityLogs()" class="px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-sync-alt"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="bg-gray-50 border-b">
+                                        <tr>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Time</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">User</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Action</th>
+                                            <th class="p-4 text-sm font-semibold text-gray-600">Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="activityLogsBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply to Feedback Modal -->
+    <div id="feedbackReplyModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-xl font-bold mb-4">Reply to Feedback</h3>
+            <div class="mb-4 p-3 bg-gray-50 rounded">
+                <p class="text-sm text-gray-600"><strong>From:</strong> <span id="replyUserName"></span></p>
+                <p class="text-sm text-gray-600"><strong>Email:</strong> <span id="replyUserEmail"></span></p>
+                <p class="text-sm text-gray-600 mt-2"><strong>Message:</strong> <span id="replyUserMessage"></span></p>
+            </div>
+            <form id="feedbackReplyForm" class="space-y-3">
+                <textarea name="adminReply" placeholder="Type your reply here..." class="w-full p-2 border rounded" rows="5" required></textarea>
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Send Reply</button>
+                    <button type="button" onclick="closeFeedbackReplyModal()" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Premium Request Action Modal -->
+    <div id="premiumRequestModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-xl font-bold mb-4" id="premiumModalTitle">Premium Request</h3>
+            <div class="mb-4 p-3 bg-gray-50 rounded">
+                <p class="text-sm text-gray-600"><strong>User:</strong> <span id="premiumUserEmail"></span></p>
+                <p class="text-sm text-gray-600"><strong>Repository:</strong> <span id="premiumRepoTitle"></span></p>
+            </div>
+            <form id="premiumRequestForm" class="space-y-3">
+                <textarea name="adminResponse" placeholder="Optional message to user..." class="w-full p-2 border rounded" rows="3"></textarea>
+                <div class="flex gap-2">
+                    <button type="button" onclick="handlePremiumRequest('approve')" class="bg-green-600 text-white px-4 py-2 rounded">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button type="button" onclick="handlePremiumRequest('reject')" class="bg-red-600 text-white px-4 py-2 rounded">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                    <button type="button" onclick="closePremiumRequestModal()" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-xl font-bold mb-4" id="modalTitle">Edit Item</h3>
+            <form id="editForm" class="space-y-3">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="editType"> 
+                <div id="editFields"></div>
+                
+                <div class="flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const API_BASE = 'http://localhost:3000/api'; 
+        const ITEMS_PER_PAGE = 6;
+
+        // --- GLOBAL STATE ---
+        let products = [];
+        let repos = [];
+        let prodPage = 1;
+        let repoPage = 1;
+
+        // --- 1. AUTH LOGIC ---
+        function checkAuth() {
+            const token = sessionStorage.getItem('admin_token');
+            const loginView = document.getElementById('login-view');
+            const dashboardView = document.getElementById('dashboard-view');
+
+            if(token) {
+                loginView.style.display = 'none';
+                dashboardView.style.display = 'flex'; // Changed to FLEX for layout
+                initDashboard(); 
+            } else {
+                loginView.style.display = 'flex';
+                dashboardView.style.display = 'none';
+            }
+        }
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPass').value;
+            const errorMsg = document.getElementById('loginError');
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if(res.ok) {
+                    sessionStorage.setItem('admin_token', data.token || 'dummy_token');
+                    location.reload(); 
+                } else {
+                    errorMsg.innerText = data.message || "Invalid Login";
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.innerText = "Server Error. Is Backend Running?";
+                errorMsg.classList.remove('hidden');
+            }
+        });
+
+        function logout() {
+            if(confirm("Logout of Admin Panel?")) {
+                sessionStorage.removeItem('admin_token');
+                location.reload();
+            }
+        }
+
+        // --- 2. DASHBOARD LOGIC ---
+        function initDashboard() {
+            fetchProducts();
+            fetchUsers();
+            fetchRepos();
+            fetchFeedback();
+            fetchPremiumRequests();
+            fetchActivityStats();
+        }
+
+        // --- DATA FETCHING ---
+        async function fetchProducts() {
+            try {
+                const res = await fetch(`${API_BASE}/products/admin`);
+                products = await res.json();
+                document.getElementById('stat-prod').innerText = products.length || 0;
+                renderProductGrid();
+            } catch(e) { console.log(e); }
+        }
+
+        async function fetchUsers() {
+            try {
+                const res = await fetch(`${API_BASE}/auth/admin`);
+                const users = await res.json();
+                document.getElementById('stat-user').innerText = users.length || 0;
+                renderUserTable(users);
+            } catch(e) { console.log(e); }
+        }
+
+        async function fetchRepos() {
+            try {
+                const res = await fetch(`${API_BASE}/repo/admin`);
+                repos = await res.json();
+                document.getElementById('stat-repo').innerText = repos.length || 0;
+                renderRepoGrid();
+            } catch(e) { console.log(e); }
+        }
+
+        async function fetchFeedback() {
+            try {
+                const res = await fetch(`${API_BASE}/feedback`);
+                const data = await res.json();
+                const feedbacks = data.feedbacks || data;
+                document.getElementById('stat-feedback').innerText = feedbacks.length || 0;
+                renderFeedbackTable(feedbacks);
+            } catch(e) { console.log(e); }
+        }
+
+        // --- RENDERING ---
+        function renderProductGrid() {
+            const container = document.getElementById('productList');
+            container.innerHTML = '';
+            
+            const start = (prodPage - 1) * ITEMS_PER_PAGE;
+            const slice = products.slice(start, start + ITEMS_PER_PAGE);
+
+            slice.forEach(p => {
+                const imgHTML = (p.image && p.image.startsWith('http')) 
+                    ? `<img src="${p.image}">` 
+                    : `<i class="fas fa-box item-icon"></i>`;
+
+                const div = document.createElement('div');
+                div.className = 'item-card';
+                div.innerHTML = `
+                    <div class="item-img-box">${imgHTML}</div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <h4 class="font-bold text-lg text-gray-800">${p.title}</h4>
+                        <p class="text-sm text-gray-500 mb-4 truncate">${p.description}</p>
+                        <div class="mt-auto flex gap-2">
+                            <button class="flex-1 bg-blue-100 text-blue-600 py-1 rounded text-sm font-medium" onclick='openEdit("product", "${p._id}")'>Edit</button>
+                            <button class="flex-1 bg-red-100 text-red-600 py-1 rounded text-sm font-medium" onclick='deleteItem("product", "${p._id}")'>Delete</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            renderPagination('product', products.length, 'prodPagination');
+        }
+
+        function renderRepoGrid() {
+            const container = document.getElementById('repoList');
+            container.innerHTML = '';
+            
+            const start = (repoPage - 1) * ITEMS_PER_PAGE;
+            const slice = repos.slice(start, start + ITEMS_PER_PAGE);
+
+            slice.forEach(r => {
+                const isPrem = r.isPremium === true;
+                const div = document.createElement('div');
+                div.className = 'item-card p-6 relative';
+                div.innerHTML = `
+                    <div class="absolute top-4 right-4 text-xs font-bold px-2 py-1 rounded ${isPrem ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">
+                        ${isPrem ? 'PREMIUM' : 'FREE'}
+                    </div>
+                    <div class="mb-4 text-indigo-600 text-3xl"><i class="fas fa-code-branch"></i></div>
+                    <h4 class="font-bold text-lg text-gray-800">${r.title}</h4>
+                    <p class="text-sm text-gray-500 mb-3">${r.description || 'No description'}</p>
+                    
+                    <div class="space-y-2 mb-4 text-xs">
+                        ${r.githubLink ? `<div class="flex items-center gap-2 text-gray-600"><i class="fab fa-github"></i><a href="${r.githubLink}" target="_blank" class="text-blue-600 hover:underline truncate">${r.githubLink}</a></div>` : ''}
+                        ${r.downloadLink ? `<div class="flex items-center gap-2 text-gray-600"><i class="fas fa-download"></i><a href="${r.downloadLink}" target="_blank" class="text-blue-600 hover:underline truncate">${r.downloadLink}</a></div>` : ''}
+                        ${r.license ? `<div class="flex items-center gap-2 text-gray-600"><i class="fas fa-certificate"></i><span>${r.license}</span></div>` : ''}
+                        ${r.version ? `<div class="flex items-center gap-2 text-gray-600"><i class="fas fa-tag"></i><span>v${r.version}</span></div>` : ''}
+                    </div>
+                    
+                    <div class="mt-auto flex gap-2">
+                        <button class="flex-1 bg-blue-100 text-blue-600 py-1 rounded text-sm font-medium" onclick='openEdit("repo", "${r._id}")'>Edit</button>
+                        <button class="flex-1 bg-red-100 text-red-600 py-1 rounded text-sm font-medium" onclick='deleteItem("repo", "${r._id}")'>Delete</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            renderPagination('repo', repos.length, 'repoPagination');
+        }
+
+        function renderUserTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="p-4 text-gray-800 font-medium">${u.email}</td>
+                    <td class="p-4"><span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">${u.role}</span></td>
+                    <td class="p-4">
+                         <span class="${u.isBlocked ? 'text-red-500' : 'text-green-500'} font-bold text-sm">
+                            ${u.isBlocked ? 'Blocked' : 'Active'}
+                         </span>
+                    </td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="toggleBlock('${u._id}', ${u.isBlocked})" class="text-xs text-blue-600 hover:underline">
+                            ${u.isBlocked ? 'Unblock' : 'Block'}
+                        </button>
+                        <button onclick="deleteItem('user', '${u._id}')" class="text-xs text-red-600 hover:underline">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderFeedbackTable(feedbacks) {
+            const tbody = document.getElementById('feedbackTableBody');
+            tbody.innerHTML = '';
+            
+            if(!feedbacks || feedbacks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No feedback submissions yet</td></tr>';
+                return;
+            }
+            
+            feedbacks.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50";
+                const date = new Date(f.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                const fullName = `${f.firstName} ${f.lastName}`;
+                
+                const statusColor = f.status === 'resolved' ? 'green' : f.status === 'in-progress' ? 'yellow' : 'gray';
+                
+                tr.innerHTML = `
+                    <td class="p-4 text-gray-800 font-medium">${fullName}</td>
+                    <td class="p-4 text-gray-600">${f.email}</td>
+                    <td class="p-4 text-gray-600">${f.company || 'N/A'}</td>
+                    <td class="p-4"><span class="bg-${statusColor}-100 text-${statusColor}-700 text-xs px-2 py-1 rounded">${f.status || 'pending'}</span></td>
+                    <td class="p-4 text-gray-500 text-sm">${date}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="viewFeedback('${f._id}')" class="text-xs text-blue-600 hover:underline" title="View Details">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button onclick="openFeedbackReply('${f._id}', '${fullName}', '${f.email}', '${(f.requirements || '').replace(/'/g, "\\'")}' )" class="text-xs text-green-600 hover:underline">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                        <button onclick="deleteItem('feedback', '${f._id}')" class="text-xs text-red-600 hover:underline">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function viewFeedback(id) {
+            fetch(`${API_BASE}/feedback`)
+                .then(res => res.json())
+                .then(data => {
+                    const feedbacks = data.feedbacks || data;
+                    const feedback = feedbacks.find(f => f._id === id);
+                    if(feedback) {
+                        alert(`Feedback Details:\n\nName: ${feedback.firstName} ${feedback.lastName}\nEmail: ${feedback.email}\nCompany: ${feedback.company || 'N/A'}\nCountry: ${feedback.country || 'N/A'}\nInterest: ${feedback.interest || 'N/A'}\nSource: ${feedback.source || 'N/A'}\n\nRequirements:\n${feedback.requirements || 'No requirements specified'}\n\nStatus: ${feedback.status || 'pending'}\nConsent: ${feedback.consent ? 'Yes' : 'No'}\n\n${feedback.adminReply ? 'Admin Reply: ' + feedback.adminReply : 'No reply yet'}`);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+
+        // --- NEW: PREMIUM REQUESTS ---
+        async function fetchPremiumRequests() {
+            try {
+                const token = sessionStorage.getItem('admin_token');
+                const res = await fetch(`${API_BASE}/premium-requests/admin/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const requests = data.requests || [];
+                
+                const pending = requests.filter(r => r.status === 'pending').length;
+                const approved = requests.filter(r => r.status === 'approved').length;
+                
+                document.getElementById('stat-pending-requests').innerText = pending;
+                document.getElementById('stat-approved-requests').innerText = approved;
+                
+                renderPremiumRequests(requests);
+            } catch(e) { 
+                console.log('Error fetching premium requests:', e);
+                document.getElementById('stat-pending-requests').innerText = '0';
+                document.getElementById('stat-approved-requests').innerText = '0';
+            }
+        }
+
+        function renderPremiumRequests(requests) {
+            const container = document.getElementById('premiumRequestsList');
+            
+            if(!requests || requests.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No premium requests yet</p>';
+                return;
+            }
+            
+            const pending = requests.filter(r => r.status === 'pending');
+            const processed = requests.filter(r => r.status !== 'pending');
+            
+            let html = '';
+            
+            if(pending.length > 0) {
+                html += '<h4 class="font-bold text-gray-700 mb-3">Pending Requests</h4>';
+                pending.forEach(req => {
+                    html += `
+                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-gray-800">${req.repositoryId?.title || 'Repository'}</p>
+                                    <p class="text-sm text-gray-600">User: ${req.userEmail}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Requested: ${new Date(req.createdAt).toLocaleString()}</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="openPremiumRequestModal('${req._id}', '${req.userEmail}', '${req.repositoryId?.title}')" 
+                                            class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
+                                        <i class="fas fa-check-circle"></i> Review
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if(processed.length > 0) {
+                html += '<h4 class="font-bold text-gray-700 mb-3 mt-6">Processed Requests</h4>';
+                processed.forEach(req => {
+                    const statusColor = req.status === 'approved' ? 'green' : 'red';
+                    html += `
+                        <div class="bg-gray-50 border-l-4 border-${statusColor}-500 p-4 rounded mb-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold text-gray-800">${req.repositoryId?.title || 'Repository'}</p>
+                                    <p class="text-sm text-gray-600">User: ${req.userEmail}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Status: <span class="font-bold text-${statusColor}-600">${req.status.toUpperCase()}</span></p>
+                                    <p class="text-xs text-gray-500">Processed: ${new Date(req.respondedAt).toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // --- NEW: ACTIVITY LOGS ---
+        async function fetchActivityStats() {
+            try {
+                const token = sessionStorage.getItem('admin_token');
+                const res = await fetch(`${API_BASE}/activity-logs/stats?days=7`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                document.getElementById('stat-activities').innerText = data.totalActivities || 0;
+            } catch(e) { 
+                console.log('Error fetching activity stats:', e);
+                document.getElementById('stat-activities').innerText = '0';
+            }
+        }
+
+        async function loadActivityLogs() {
+            try {
+                const token = sessionStorage.getItem('admin_token');
+                const action = document.getElementById('actionFilter')?.value || '';
+                const url = action ? `${API_BASE}/activity-logs/all?action=${action}&limit=50` : `${API_BASE}/activity-logs/all?limit=50`;
+                
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                renderActivityLogs(data.logs || []);
+            } catch(e) { 
+                console.log('Error loading activity logs:', e);
+                document.getElementById('activityLogsBody').innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">Failed to load logs</td></tr>';
+            }
+        }
+
+        function renderActivityLogs(logs) {
+            const tbody = document.getElementById('activityLogsBody');
+            
+            if(!logs || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No activity logs found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = logs.map(log => {
+                const time = new Date(log.createdAt).toLocaleString();
+                const actionColor = log.action.includes('granted') ? 'text-green-600' : log.action.includes('rejected') ? 'text-red-600' : 'text-gray-600';
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4 text-sm text-gray-600">${time}</td>
+                        <td class="p-4 text-sm text-gray-800">${log.userEmail}</td>
+                        <td class="p-4 text-sm ${actionColor} font-medium">${log.action.replace(/_/g, ' ').toUpperCase()}</td>
+                        <td class="p-4 text-sm text-gray-600">${log.details || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- MODAL FUNCTIONS ---
+        let currentFeedbackId = null;
+        let currentPremiumRequestId = null;
+
+        function openFeedbackReply(id, name, email, message) {
+            currentFeedbackId = id;
+            document.getElementById('replyUserName').textContent = name;
+            document.getElementById('replyUserEmail').textContent = email;
+            document.getElementById('replyUserMessage').textContent = message;
+            document.getElementById('feedbackReplyModal').style.display = 'flex';
+        }
+
+        function closeFeedbackReplyModal() {
+            currentFeedbackId = null;
+            document.getElementById('feedbackReplyModal').style.display = 'none';
+            document.getElementById('feedbackReplyForm').reset();
+        }
+
+        document.getElementById('feedbackReplyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const adminReply = e.target.adminReply.value;
+            const token = sessionStorage.getItem('admin_token');
+            
+            try {
+                const res = await fetch(`${API_BASE}/feedback/${currentFeedbackId}/reply`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ adminReply })
+                });
+                
+                if(res.ok) {
+                    alert('Reply sent successfully!');
+                    closeFeedbackReplyModal();
+                    fetchFeedback();
+                } else {
+                    alert('Failed to send reply');
+                }
+            } catch(err) {
+                alert('Error sending reply');
+                console.error(err);
+            }
+        });
+
+        function openPremiumRequestModal(requestId, userEmail, repoTitle) {
+            currentPremiumRequestId = requestId;
+            document.getElementById('premiumUserEmail').textContent = userEmail;
+            document.getElementById('premiumRepoTitle').textContent = repoTitle;
+            document.getElementById('premiumRequestModal').style.display = 'flex';
+        }
+
+        function closePremiumRequestModal() {
+            currentPremiumRequestId = null;
+            document.getElementById('premiumRequestModal').style.display = 'none';
+            document.getElementById('premiumRequestForm').reset();
+        }
+
+        async function handlePremiumRequest(action) {
+            const adminResponse = document.querySelector('#premiumRequestForm textarea[name="adminResponse"]').value;
+            const token = sessionStorage.getItem('admin_token');
+            const endpoint = action === 'approve' ? 'approve' : 'reject';
+            
+            try {
+                const res = await fetch(`${API_BASE}/premium-requests/admin/${endpoint}/${currentPremiumRequestId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ adminResponse })
+                });
+                
+                if(res.ok) {
+                    alert(`Request ${action}d successfully! User will be notified via email.`);
+                    closePremiumRequestModal();
+                    fetchPremiumRequests();
+                } else {
+                    const data = await res.json();
+                    alert(`Failed to ${action} request: ${data.message}`);
+                }
+            } catch(err) {
+                alert(`Error processing request`);
+                console.error(err);
+            }
+        }
+
+        // --- ADD / EDIT / DELETE LOGIC ---
+        document.getElementById('createProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await apiCall('/products/admin', 'POST', Object.fromEntries(formData.entries()));
+            e.target.reset();
+            fetchProducts();
+        });
+
+        document.getElementById('createRepoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.isPremium = data.isPremium === 'true';
+            await apiCall('/repo/admin', 'POST', data);
+            e.target.reset();
+            fetchRepos();
+        });
+
+        async function deleteItem(type, id) {
+            if(!confirm("Are you sure?")) return;
+            let endpoint = '';
+            if(type === 'product') endpoint = `/products/admin/${id}`;
+            if(type === 'repo') endpoint = `/repo/admin/${id}`;
+            if(type === 'user') endpoint = `/auth/admin/${id}`;
+            if(type === 'feedback') endpoint = `/feedback/${id}`;
+            
+            await apiCall(endpoint, 'DELETE');
+            
+            if(type === 'product') fetchProducts();
+            if(type === 'repo') fetchRepos();
+            if(type === 'user') fetchUsers();
+            if(type === 'feedback') fetchFeedback();
+        }
+
+        async function toggleBlock(id, currentStatus) {
+            await apiCall(`/auth/users/${id}/block`, 'PUT', { isBlocked: !currentStatus });
+            fetchUsers();
+        }
+
+        function openEdit(type, id) {
+            const modal = document.getElementById('editModal');
+            const title = document.getElementById('modalTitle');
+            const fields = document.getElementById('editFields');
+            document.getElementById('editId').value = id;
+            document.getElementById('editType').value = type;
+            fields.innerHTML = ''; 
+
+            if(type === 'product') {
+                const p = products.find(x => x._id === id);
+                title.innerText = "Edit Product";
+                fields.innerHTML = `
+                    <input class="w-full p-2 border rounded mb-2" id="e-title" value="${p.title}">
+                    <input class="w-full p-2 border rounded mb-2" id="e-img" value="${p.image}">
+                    <textarea class="w-full p-2 border rounded" id="e-desc">${p.description}</textarea>
+                `;
+            } else if (type === 'repo') {
+                const r = repos.find(x => x._id === id);
+                title.innerText = "Edit Repository";
+                fields.innerHTML = `
+                    <input class="w-full p-2 border rounded mb-2" id="e-title" placeholder="Title" value="${r.title}">
+                    <textarea class="w-full p-2 border rounded mb-2" id="e-desc" placeholder="Description">${r.description || ''}</textarea>
+                    <input class="w-full p-2 border rounded mb-2" id="e-link" placeholder="GitHub Link" value="${r.githubLink || ''}">
+                    <input class="w-full p-2 border rounded mb-2" id="e-download" placeholder="Download Link" value="${r.downloadLink || ''}">
+                    <input class="w-full p-2 border rounded mb-2" id="e-license" placeholder="License (e.g., MIT)" value="${r.license || ''}">
+                    <input class="w-full p-2 border rounded mb-2" id="e-version" placeholder="Version (e.g., 1.0.0)" value="${r.version || ''}">
+                    <select class="w-full p-2 border rounded bg-white" id="e-prem">
+                        <option value="false" ${!r.isPremium ? 'selected' : ''}>Free</option>
+                        <option value="true" ${r.isPremium ? 'selected' : ''}>Premium</option>
+                    </select>
+                `;
+            }
+            modal.style.display = 'flex';
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const type = document.getElementById('editType').value;
+            let data = {};
+
+            if(type === 'product') {
+                data = {
+                    title: document.getElementById('e-title').value,
+                    image: document.getElementById('e-img').value,
+                    description: document.getElementById('e-desc').value
+                };
+                await apiCall(`/products/admin/${id}`, 'PUT', data);
+                fetchProducts();
+            } else {
+                data = {
+                    title: document.getElementById('e-title').value,
+                    description: document.getElementById('e-desc').value,
+                    githubLink: document.getElementById('e-link').value,
+                    downloadLink: document.getElementById('e-download').value,
+                    license: document.getElementById('e-license').value,
+                    version: document.getElementById('e-version').value,
+                    isPremium: document.getElementById('e-prem').value === 'true'
+                };
+                await apiCall(`/repo/admin/${id}`, 'PUT', data);
+                fetchRepos();
+            }
+            closeModal();
+        });
+
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+        function renderPagination(type, total, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const pages = Math.ceil(total / ITEMS_PER_PAGE);
+            if(pages <= 1) return;
+
+            const curr = type === 'product' ? prodPage : repoPage;
+
+            for(let i=1; i<=pages; i++) {
+                const btn = document.createElement('div');
+                btn.className = `page-btn ${i === curr ? 'active' : ''}`;
+                btn.innerText = i;
+                btn.onclick = () => {
+                    if(type === 'product') { prodPage = i; renderProductGrid(); }
+                    else { repoPage = i; renderRepoGrid(); }
+                };
+                container.appendChild(btn);
+            }
+        }
+
+        async function apiCall(endpoint, method, body) {
+            try {
+                const opts = { method, headers: { 'Content-Type': 'application/json' } };
+                if(body) opts.body = JSON.stringify(body);
+                const res = await fetch(`${API_BASE}${endpoint}`, opts);
+                if(!res.ok) throw new Error("Request Failed");
+                return await res.json();
+            } catch(e) {
+                console.error(e);
+                alert("Operation Failed");
+            }
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(id + '-content').classList.add('active');
+            
+            const titles = {
+                'dashboard': 'Dashboard',
+                'products': 'Products',
+                'users': 'Users',
+                'repositories': 'Repositories',
+                'premium-requests': 'Premium Requests',
+                'feedback': 'Feedback',
+                'activity-logs': 'Activity Logs'
+            };
+            
+            document.getElementById('pageTitle').innerText = titles[id] || id.charAt(0).toUpperCase() + id.slice(1);
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-indigo-50', 'text-indigo-600'));
+            
+            // Load data for specific sections
+            if(id === 'activity-logs') {
+                loadActivityLogs();
+            }
+        }
+
+        // Load activity logs when filter changes
+        document.getElementById('actionFilter')?.addEventListener('change', loadActivityLogs);
+
+        checkAuth();
+    </script>
+</body>
+</html>

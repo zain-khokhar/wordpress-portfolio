@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Digital Agency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & GLOBAL --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px; /* Added padding to prevent sticking to screen edges */
+        }
+
+        /* Hide WP Header if present */
+        body.page-id-55 .site-header { display: none; }
+
+        /* --- MAIN LAYOUT (Split Screen) --- */
+        .auth-wrapper {
+            display: flex;
+            background: #fff;
+            width: 1000px;
+            max-width: 100%;
+            /* FIX 1: Changed fixed height to min-height so it grows if needed */
+            min-height: 650px;
+            border-radius: 20px;
+            overflow: hidden; /* Keeps corners rounded */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        /* --- LEFT SIDE (Visuals) --- */
+        .auth-visuals {
+            flex: 1;
+            /* FIX 2: Made gradient slightly darker for better contrast */
+            background: linear-gradient(135deg, #1e2a36, #10171e);
+            /* FIX 3: Forced white text color */
+            color: #ffffff !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 40px; /* Increased vertical padding */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative circles */
+        .auth-visuals::before {
+            content: ''; position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%;
+        }
+        .auth-visuals::after {
+            content: ''; position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%;
+        }
+
+        .brand-content { position: relative; z-index: 2; }
+        .brand-content h1 { 
+            font-size: 3rem; 
+            line-height: 1.2; 
+            margin-bottom: 20px; 
+            font-weight: 700;
+            color: #ffffff; /* Ensure white */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3); /* Added shadow for pop */
+        }
+        .brand-content p { 
+            font-size: 1.1rem; 
+            color: rgba(255,255,255,0.9); /* High contrast white */
+            line-height: 1.6; 
+            margin-bottom: 30px; 
+        }
+        .brand-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .brand-btn:hover { background: white; color: #1e2a36; border-color: white; }
+
+        /* --- RIGHT SIDE (Form) --- */
+        .auth-form-container {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #ffffff;
+        }
+
+        .form-header { margin-bottom: 30px; }
+        .form-header h2 { font-size: 2rem; color: #333; font-weight: 700; margin-bottom: 5px; }
+        .form-header p { color: #666; font-size: 0.95rem; }
+
+        /* Input Styling */
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .input-wrapper { position: relative; }
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .input-wrapper input, .input-wrapper select {
+            width: 100%;
+            padding: 12px 15px 12px 45px; /* Space for icon */
+            border: 2px solid #f0f2f5;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            outline: none;
+            background: #f9fafb;
+            color: #333;
+        }
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: #3498db;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+        }
+        .input-wrapper input:focus + i { color: #3498db; }
+
+        /* Button Styling */
+        .signup-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        .signup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Message & Links */
+        #message { min-height: 20px; margin-bottom: 15px; font-size: 0.9rem; font-weight: 500; text-align: center; }
+        .message.success { color: #27ae60; background: #e8f8f5; padding: 10px; border-radius: 6px; }
+        .message.error { color: #e74c3c; background: #fdedec; padding: 10px; border-radius: 6px; }
+
+        .login-link { margin-top: 20px; text-align: center; font-size: 0.9rem; color: #666; }
+        .login-link a { color: #3498db; text-decoration: none; font-weight: 600; }
+        .login-link a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            .auth-wrapper { flex-direction: column; min-height: auto; }
+            .auth-visuals { padding: 50px 30px; text-align: center; min-height: 300px; }
+            .auth-visuals h1 { font-size: 2.2rem; }
+            .auth-form-container { padding: 40px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-wrapper">
+        <div class="auth-visuals">
+            <div class="brand-content">
+                <h1>Build Your<br>Idea Today.</h1>
+                <p>Join our community of innovators. Access premium tools, manage your repositories, and scale your business with our IT solutions.</p>
+                <a href="#" class="brand-btn">Learn More</a>
+            </div>
+        </div>
+
+        <div class="auth-form-container">
+            <div class="form-header">
+                <h2 id="formTitle">Create Account</h2>
+                <p id="formSubtitle">Start your journey with Digital Agency 🚀</p>
+            </div>
+
+            <form id="authForm" novalidate>
+                
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Min 8 characters" required>
+                    </div>
+                </div>
+
+                <div class="input-group" id="confirmPasswordGroup">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-check-circle"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password">
+                    </div>
+                </div>
+
+                <div class="input-group" id="roleGroup">
+                    <label for="role">I am a...</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user-tag"></i>
+                        <select id="role" name="role">
+                            <option value="user" selected>User</option>
+                            <option value="guest">Guest</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="message"></div>
+
+                <button type="submit" class="signup-btn" id="submitBtn">Create Account</button>
+
+                <p class="login-link">
+                    <span id="toggleText">Already have an account?</span> <a href="#" id="toggleLink">Sign In</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authForm = document.getElementById('authForm');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const role = document.getElementById('role');
+            const messageDiv = document.getElementById('message');
+            
+            // UI Elements
+            const formTitle = document.getElementById('formTitle');
+            const formSubtitle = document.getElementById('formSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleText = document.getElementById('toggleText');
+            const toggleLink = document.getElementById('toggleLink');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+            const roleGroup = document.getElementById('roleGroup');
+            
+            let isSignUpMode = true;
+
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = `message ${type}`;
+            }
+
+            // Toggle between Sign Up and Sign In
+            toggleLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                isSignUpMode = !isSignUpMode;
+                
+                if (isSignUpMode) {
+                    // Switch to Sign Up mode
+                    formTitle.textContent = 'Create Account';
+                    formSubtitle.textContent = 'Start your journey with Digital Agency 🚀';
+                    submitBtn.textContent = 'Create Account';
+                    toggleText.textContent = 'Already have an account?';
+                    toggleLink.textContent = 'Sign In';
+                    confirmPasswordGroup.style.display = 'block';
+                    roleGroup.style.display = 'block';
+                } else {
+                    // Switch to Sign In mode
+                    formTitle.textContent = 'Welcome Back';
+                    formSubtitle.textContent = 'Sign in to continue your journey 👋';
+                    submitBtn.textContent = 'Sign In';
+                    toggleText.textContent = "Don't have an account?";
+                    toggleLink.textContent = 'Sign Up';
+                    confirmPasswordGroup.style.display = 'none';
+                    roleGroup.style.display = 'none';
+                }
+                
+                // Clear form and messages
+                authForm.reset();
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            });
+
+            authForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+
+                // Basic validation
+                if (!email.value || !password.value) {
+                    showMessage('Email and password are required.', 'error');
+                    return;
+                }
+
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email.value)) {
+                    showMessage('Please enter a valid email address.', 'error');
+                    return;
+                }
+
+                if (isSignUpMode) {
+                    // Sign Up validation
+                    if (!confirmPassword.value) {
+                        showMessage('Please confirm your password.', 'error');
+                        return;
+                    }
+
+                    if (password.value.length < 8) {
+                        showMessage('Password must be at least 8 characters long.', 'error');
+                        return;
+                    }
+
+                    if (password.value !== confirmPassword.value) {
+                        showMessage('Passwords do not match.', 'error');
+                        return;
+                    }
+
+                    // Sign Up API Call
+                    const userData = {
+                        email: email.value,
+                        password: password.value,
+                        role: role.value
+                    };
+
+                    showMessage('Creating your account...', 'success');
+
+                    try {
+                        const response = await fetch('http://localhost:3000/api/auth/login', { 
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(userData)
+                        });
+
+                        const data = await response.json();
+
+                        if (data.token) {
+                            showMessage('Account created successfully! Redirecting...', 'success');
+                            localStorage.setItem('user_token', data.token);
+                            setTimeout(() => {
+                                window.location.href = 'http://localhost/portfolio/wordpress/';
+                            }, 1500);
+                        } else {
+                            showMessage(data.message || 'Signup failed!', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showMessage('Server error. Please try again. Is the backend running?', 'error');
+                    }
+                } else {
+                    // Sign In API Call
+                    const loginData = {
+                        email: email.value,
+                        password: password.value
+                    };
+
+                    showMessage('Signing in...', 'success');
+
+                    try {
+                        const response = await fetch('http://localhost:3000/api/auth/login', { 
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(loginData)
+                        });
+
+                        const data = await response.json();
+
+                        if (data.token) {
+                            showMessage('Login successful! Redirecting...', 'success');
+                            localStorage.setItem('user_token', data.token);
+                            setTimeout(() => {
+                                window.location.href = 'http://localhost/portfolio/wordpress/';
+                            }, 1500);
+                        } else {
+                            showMessage(data.message || 'Login failed! Invalid credentials.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showMessage('Server error. Please try again. Is the backend running?', 'error');
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

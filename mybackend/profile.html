@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | IT Solutions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: #f4f7f6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 80px auto 0;
+            padding: 20px;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            padding: 40px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 3rem;
+            color: #3498db;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .profile-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .profile-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .profile-body {
+            background: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+            background: #f8f9fa;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .tab-btn.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .info-item label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 1rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            padding: 12px 30px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-danger {
+            padding: 12px 30px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .premium-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .premium-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .premium-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .premium-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .premium-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .premium-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .btn-download {
+            width: 100%;
+            padding: 10px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-download:hover {
+            background: #229954;
+        }
+
+        .request-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .request-card {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-card.pending {
+            border-left-color: #f39c12;
+        }
+
+        .request-card.approved {
+            border-left-color: #27ae60;
+        }
+
+        .request-card.rejected {
+            border-left-color: #e74c3c;
+        }
+
+        .request-info h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .request-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                margin-top: 20px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .info-grid, .premium-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1 id="profileName">Loading...</h1>
+            <p id="profileEmail">Loading...</p>
+        </div>
+
+        <div class="profile-body">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="info">
+                    <i class="fas fa-user-circle"></i> Profile Info
+                </button>
+                <button class="tab-btn" data-tab="premium">
+                    <i class="fas fa-crown"></i> Premium Access
+                </button>
+                <button class="tab-btn" data-tab="requests">
+                    <i class="fas fa-paper-plane"></i> My Requests
+                </button>
+                <button class="tab-btn" data-tab="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+
+            <!-- Profile Info Tab -->
+            <div class="tab-content active" id="info">
+                <div id="messageBox" class="message"></div>
+                
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">
+                    <i class="fas fa-info-circle"></i> Account Information
+                </h2>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Email Address</label>
+                        <div class="value" id="infoEmail">Loading...</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Account Role</label>
+                        <div class="value" id="infoRole">Loading...</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Member Since</label>
+                        <div class="value" id="infoJoined">Loading...</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Premium Repositories</label>
+                        <div class="value" id="infoPremiumCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Access Tab -->
+            <div class="tab-content" id="premium">
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">
+                    <i class="fas fa-crown"></i> My Premium Repositories
+                </h2>
+                <div class="premium-grid" id="premiumList">
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>Loading premium repositories...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Tab -->
+            <div class="tab-content" id="requests">
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">
+                    <i class="fas fa-paper-plane"></i> Premium Access Requests
+                </h2>
+                <div class="request-grid" id="requestsList">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Loading requests...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="settings">
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">
+                    <i class="fas fa-cog"></i> Account Settings
+                </h2>
+                
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn-primary" onclick="window.location.href='/'">
+                        <i class="fas fa-home"></i> Back to Home
+                    </button>
+                    <button class="btn-danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let userData = null;
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('user_token') || sessionStorage.getItem('user_token');
+            if (!token) {
+                alert('Please login to view your profile');
+                window.location.href = 'http://localhost/portfolio/wordpress/signup/';
+                return false;
+            }
+            return token;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Load user profile
+        async function loadProfile() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                // Note: You'll need to create a /api/auth/profile endpoint
+                const response = await fetch(`${API_BASE}/auth/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    userData = await response.json();
+                    displayProfile(userData);
+                    loadPremiumAccess();
+                    loadRequests();
+                } else {
+                    throw new Error('Failed to load profile');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('Failed to load profile. Please login again.', 'error');
+                setTimeout(() => window.location.href = 'http://localhost/portfolio/wordpress/signup/', 2000);
+            }
+        }
+
+        function displayProfile(user) {
+            document.getElementById('profileName').textContent = user.email.split('@')[0];
+            document.getElementById('profileEmail').textContent = user.email;
+            
+            document.getElementById('infoEmail').textContent = user.email;
+            document.getElementById('infoRole').textContent = user.role || 'User';
+            document.getElementById('infoJoined').textContent = new Date(user.createdAt).toLocaleDateString();
+            document.getElementById('infoPremiumCount').textContent = user.premiumAccess?.length || 0;
+        }
+
+        async function loadPremiumAccess() {
+            const container = document.getElementById('premiumList');
+            
+            if (!userData?.premiumAccess || userData.premiumAccess.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>You don't have any premium repositories yet.</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Browse our repositories and request premium access!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                // Fetch repository details
+                const repoIds = userData.premiumAccess.map(access => access.repositoryId);
+                const repoPromises = repoIds.map(id => 
+                    fetch(`${API_BASE}/repo/admin`).then(res => res.json())
+                );
+
+                const allRepos = await Promise.all(repoPromises);
+                const repos = allRepos.flat().filter(repo => 
+                    repoIds.includes(repo._id)
+                );
+
+                container.innerHTML = repos.map(repo => `
+                    <div class="premium-card">
+                        <span class="premium-badge"><i class="fas fa-crown"></i> PREMIUM</span>
+                        <h3>${repo.title}</h3>
+                        <p>${repo.description}</p>
+                        <a href="${repo.githubLink}" target="_blank" class="btn-download">
+                            <i class="fas fa-download"></i> Download from GitHub
+                        </a>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading premium access:', error);
+                container.innerHTML = `<div class="empty-state"><p>Error loading premium repositories</p></div>`;
+            }
+        }
+
+        async function loadRequests() {
+            const token = checkAuth();
+            const container = document.getElementById('requestsList');
+
+            try {
+                const response = await fetch(`${API_BASE}/premium-requests/user`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.requests.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>You haven't made any premium access requests yet.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = data.requests.map(req => `
+                        <div class="request-card ${req.status}">
+                            <div class="request-info">
+                                <h4>${req.repositoryId?.title || 'Repository'}</h4>
+                                <p>Requested: ${new Date(req.createdAt).toLocaleDateString()}</p>
+                                ${req.adminResponse ? `<p style="margin-top: 5px;"><strong>Response:</strong> ${req.adminResponse}</p>` : ''}
+                            </div>
+                            <span class="status-badge ${req.status}">${req.status}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                container.innerHTML = `<div class="empty-state"><p>Error loading requests</p></div>`;
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = text;
+            messageBox.className = `message ${type}`;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user_token');
+                sessionStorage.removeItem('user_token');
+                window.location.href = '/signup.html';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+
+</body>
+</html>
